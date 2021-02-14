@@ -1,8 +1,31 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %}
 {% block body %}
 {% block content %}
-<div class="background">
 <h1>Home Page</h1>
-</div>
+
+<form method="POST">
+    <h3 align="center">Clat!</h3>
+    <div class="form-group">
+        <label for="clatname">Clat Group Name</label>
+        <input type="text" 
+        class="form-control" 
+        id="clatname" 
+        name="clatname" 
+        placeholder="Enter Clat name">
+    </div>
+  
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" 
+        class="form-control" 
+        id="password" 
+        name="password" 
+        placeholder="Enter Clat password">
+    </div>
+    <br>
+    <a href='/notes'><button type="submit" class="btn btn-primary">Clat!</button></a>
+  </form>
+  <br>
+  <a href='/create-clat'><button class="btn btn-primary">Create Clat</button></a>
 {% endblock %}
 {% endblock %}

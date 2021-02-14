@@ -15,3 +15,9 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(150)) # as well as username, go to auth login
     password = db.Column(db.String(150))
     notes = db.relationship('Note')
+
+
+class Clat(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    clatname = db.Column(db.String(150), unique=True) # as well as username, go to auth login
+    clatpassword = db.Column(db.String(150))

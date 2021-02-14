@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
-from .models import User
+from .models import User, Clat
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
 import json
 
 auth = Blueprint('auth', __name__)
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -27,12 +28,6 @@ def login():
 
     return render_template("login.html", user=current_user)
 
-
-@auth.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('views.home'))
 
 
 @auth.route('/sign-up', methods=['GET', 'POST'])
@@ -66,6 +61,16 @@ def sign_up():
 
     return render_template("sign-up.html", user=current_user)
 
+
+
+@auth.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('views.home'))
+    
+
+
 @auth.route('/delete-account', methods=['GET','POST'])
 def delete_user():
     try:
@@ -78,3 +83,51 @@ def delete_user():
     return redirect(url_for('views.home'))
 
 
+
+# Clat authentication
+
+@auth.route('/create-clat', methods=['GET', 'POST'])
+@login_required
+def create_clat():
+    if request.method == 'POST':
+        clatname = request.form.get('clatname')
+        clatpassword1 = request.form.get('clatpassword1')
+        clatpassword2 = request.form.get('clatpassword2')
+
+        clat = Clat.query.filter_by(clatname=clatname).first()
+        if clat:
+            flash('Clat name already exists.', category='error')
+        elif clatname == "":
+            flash('You must provide a Clat name.', category='error')
+        elif clatpassword1 != clatpassword2:
+            flash('Passwords don\'t match.', category='error')
+        elif len(clatpassword1) < 7:
+            flash('Password at least 7 characters.', category='error')
+        else:   # add clat to database
+            new_clat = Clat(clatname=clatname, clatpassword=generate_password_hash(clatpassword1, method='sha256'))
+            db.session.add(new_clat)
+            db.session.commit()
+            flash('Clat created!', category='success')
+            return redirect(url_for('views.home'))
+
+    return render_template("create.html", user=current_user)
+
+
+
+@auth.route('/', methods=['GET','POST'])
+def enter_clat():
+    if request.method == 'POST':
+        clatname = request.form.get('clatname')
+        password = request.form.get('password')
+
+        clat = Clat.query.filter_by(clatname=clatname).first()
+        if clat:
+            if check_password_hash(clat.password, password):
+                flash('Entered successfully!', category='success')
+                return redirect(url_for('views.notes'))
+            else:
+                flash('Incorrect password, try again.', category='error')
+        else:
+            flash('Clat does not exist', category='error')
+
+    return render_template("home.html", user=current_user)

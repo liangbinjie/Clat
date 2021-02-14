@@ -8,14 +8,17 @@ views = Blueprint('views', __name__)
 
 
 @views.route('/')   # home page route
-#@login_required # cant go home page unless you are logged in
 def home():
     return render_template("home.html", user=current_user)
+
+
 
 @views.route('/profile')
 @login_required
 def profile():
     return render_template('dashboard.html', name=current_user.name, user=current_user)
+
+
 
 @views.route('/notes', methods=["GET", "POST"])
 @login_required
@@ -35,6 +38,7 @@ def notes():
     return render_template('notes.html', user=current_user)
 
 
+
 @views.route('/delete-note', methods=['POST'])
 def delete_note():
     note = json.loads(request.data)
@@ -46,3 +50,5 @@ def delete_note():
             db.session.commit()
 
     return jsonify({})
+
+
